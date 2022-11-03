@@ -11,7 +11,7 @@ model = torch.jit.load('models/model.zip')
 
 @app.route('/')
 def hello_world():
-    return 'Server is online'
+    return 'Server online'
 
 @app.route("/predict", methods=['POST'])
 def predict():
