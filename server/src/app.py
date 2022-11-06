@@ -103,21 +103,27 @@ def test():
 @app.route("/testmeta", methods=['POST'])
 def testmeta():
     try:
-        age = request.json['age']
-        sex = request.json['sex']
-        location = request.json['location']
+        #file = request.files['file'].stream
+        #file = request.json['file']
+        file = request.files['file'].stream
+
+        age = request.form.get('age')
+        sex = request.form.get('sex')
+        location = request.form.get('location')
+        #age = request.json['age']
+        #sex = request.json['sex']
+        #location = request.json['location']
 
         # load metadata encoder
-        hot_enconder = load('hot_enconder.joblib')
-        meta = [age, sex, location]
-        onehot = hot_enconder.transform(
-            [meta]).toarray()
-        t = str(onehot)
+        #hot_enconder = load('hot_enconder.joblib')
+        #meta = [age, sex, location]
+        # onehot = hot_enconder.transform(
+        #    [meta]).toarray()
         return {
             'age': age,
             'sex': sex,
             'location': location,
-            'meta': t,
+
         }
     except Exception as e:
         return f"An Error Occurred: {e}"
@@ -140,11 +146,14 @@ def predictmeta():
         img = np.array(img)
         img = torch.FloatTensor(img.transpose((2, 0, 1)) / 255)
         # load meta
-        #age = request.json['age']
-        #sex = request.json['sex']
-        #location = request.json['location']
+        age = request.form.get('age')
+        sex = request.form.get('sex')
+        location = request.form.get('location')
+        meta = [age, sex, location]
         meta = hot_enconder.transform(
-            [['30', 'male', 'torso']]).toarray()
+            [meta]).toarray()
+        # meta = hot_enconder.transform(
+        #    [['30', 'male', 'torso']]).toarray()
         meta = torch.tensor(meta).float()
         # get predictions
         preds = model(img.unsqueeze(0), meta.float()).squeeze()
