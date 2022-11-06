@@ -131,24 +131,23 @@ def predictmeta():
         hot_enconder = load('hot_enconder.joblib')
         # Load torch model
         model = torch.jit.load('models/model_meta.zip', map_location='cpu')
+        model.eval()
 
         # load image
         img = Image.open(request.files['file'].stream).convert(
             'RGB').resize((380, 380))
+
         img = np.array(img)
         img = torch.FloatTensor(img.transpose((2, 0, 1)) / 255)
         # load meta
-        age = request.args.get("age")
-        sex = request.args.get("sex")
-        location = request.args.get("location")
         #age = request.json['age']
         #sex = request.json['sex']
         #location = request.json['location']
         meta = hot_enconder.transform(
-            [[age, sex, location]]).toarray()
-
+            [['30', 'male', 'torso']]).toarray()
+        meta = torch.tensor(meta).float()
         # get predictions
-        preds = model(img.unsqueeze(0), meta).squeeze()
+        preds = model(img.unsqueeze(0), meta.float()).squeeze()
         probas = torch.softmax(preds, axis=0)
 
         # apply rescaling
@@ -161,7 +160,6 @@ def predictmeta():
         ix = torch.argmax(thresholding, axis=0)
 
         labels = ['AK', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'SCC', 'UNK', 'VASC']
-
         return {
             'label': labels[ix],
             'score': thresholding[ix].item(),
