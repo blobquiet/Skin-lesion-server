@@ -1,9 +1,0 @@
--f https://download.pytorch.org/whl/torch_stable.html
-Flask
-Flask-Cors==3.0.10
-gunicorn==20.1.0
-numpy
-Pillow==9.2.0
-torch==1.13.0+cpu
-torchvision==0.14.0+cpu
-

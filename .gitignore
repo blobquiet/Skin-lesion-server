@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Firebase key
+server/src/key.json
+
+# Models
+server/models/*

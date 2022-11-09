@@ -9,16 +9,18 @@ CORS(app)
 
 model = torch.jit.load('models/model.zip')
 
+
 @app.route('/')
 def hello_world():
     return 'Server online'
+
 
 @app.route("/predict", methods=['POST'])
 def predict():
 
     # load image
     img = Image.open(request.files['file'].stream).convert(
-        'RGB').resize((224, 224))
+        'RGB').resize((456, 456))
     img = np.array(img)
     img = torch.FloatTensor(img.transpose((2, 0, 1)) / 255)
 
@@ -26,11 +28,13 @@ def predict():
     preds = model(img.unsqueeze(0)).squeeze()
     probas = torch.softmax(preds, axis=0)
     ix = torch.argmax(probas, axis=0)
-
+    
+    labels= ['AK', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'SCC', 'UNK', 'VASC']
     return {
-        'label': model.labels[ix],
+        'label': labels[ix],
         'score': probas[ix].item()
     }
+
 
 if __name__ == "__main__":
     app.run()

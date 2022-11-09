@@ -203,6 +203,8 @@ def predict():
             meta = torch.tensor(meta).float()
             app.logger.info("try")
 
+            app.logger.info(meta)
+
             # get predictions
             preds = model(img.unsqueeze(0), meta.float()).squeeze()
             app.logger.info("meta")
@@ -228,10 +230,23 @@ def predict():
         ix = torch.argmax(thresholding, axis=0)
 
         labels = ['AK', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'SCC', 'UNK', 'VASC']
+        classes = [
+            "Actinickeratosis",
+            "Basal cell carcinoma",
+            "Benign keratosis",
+            "Dermatofibroma",
+            "Melanoma",
+            "Melanocytic nevus",
+            "Squamous cell carcinoma",
+            "Unknown",
+            "Vascular lesion",
+        ]
 
         app.logger.info(labels[ix])
         return {
             'label': labels[ix],
+            'diagnosis': classes[ix],
+            'pred': thresholding.tolist(),
             'score': thresholding[ix].item(),
         }
 
