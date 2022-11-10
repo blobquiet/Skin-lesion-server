@@ -1,6 +1,8 @@
 import os
 import time
 from flask import Flask, request, jsonify, render_template
+
+from flask_cors import CORS, cross_origin
 from firebase_admin import credentials, firestore, initialize_app
 import torch
 import numpy as np
@@ -13,6 +15,10 @@ from PIL import Image
 
 # Initialize Flask app
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+#CORS(app, resources={r"/*": {"origins": "*"}})
+#cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Initialize Firestore DB
 cred = credentials.Certificate('src/key.json')
@@ -27,6 +33,7 @@ def format_server_time():
 
 
 @app.route('/process', methods=['POST'])
+@cross_origin()
 def process():
     upload_dir = "images"
     file_names = []
@@ -45,6 +52,7 @@ def process():
 
 
 @app.route('/saveimage', methods=['POST'])
+@cross_origin()
 def upload_test():
     upload_dir = "images"
     file_names = []
@@ -63,12 +71,14 @@ def upload_test():
 
 
 @app.route('/')
+@cross_origin()
 def index():
     context = {'server_time': format_server_time()}
     return render_template('index.html', context=context)
 
 
 @app.route('/add', methods=['POST'])
+@cross_origin()
 def create():
     """
         create() : Add document to Firestore collection with request body.
@@ -84,6 +94,7 @@ def create():
 
 
 @app.route("/predict_test", methods=['POST'])
+@cross_origin()
 def predict_test():
 
     try:
@@ -121,6 +132,7 @@ def predict_test():
 
 
 @app.route("/test", methods=['POST'])
+@cross_origin()
 def test():
     try:
         age = request.json['age']
@@ -139,6 +151,7 @@ def test():
 
 
 @app.route("/testmeta", methods=['POST'])
+@cross_origin()
 def testmeta():
     try:
         # file = request.files['file'].stream
@@ -168,6 +181,7 @@ def testmeta():
 
 
 @app.route("/predict", methods=['POST'])
+@cross_origin()
 def predict():
 
     try:
